@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="System.Windows.Extensions" Version="7.0.0" />
     <PackageReference Include="YoutubeExplode" Version="6.3.4" />
     <PackageReference Include="YoutubeExplode.Converter" Version="6.3.4" />
   </ItemGroup>
