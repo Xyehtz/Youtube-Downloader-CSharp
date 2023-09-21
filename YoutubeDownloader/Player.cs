@@ -28,8 +28,10 @@ namespace MusicPlayer
                 mediaPlayer.Play();
 
                 Console.ReadKey();
-                mediaPlayer.Dispose();
+                mediaPlayer.Stop();
+                
             }
+            mediaPlayer.Dispose();
         }
 }
 }
