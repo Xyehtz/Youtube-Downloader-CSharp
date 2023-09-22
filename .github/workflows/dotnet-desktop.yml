@@ -1,4 +1,5 @@
 # Action to build and release the console app
+# Repo now has the secret
 
 name: Build and Publish .NET Console App
 
