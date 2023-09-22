@@ -1,33 +1,34 @@
-name: Build and Release (Self-Contained)
+name: Build and Publish .NET Console App
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - master
 
 jobs:
-    build:
-        runs-on: windows-latest
-            
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v2
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
 
-        - name: Set up .NET Core
-          uses: actions/setup-dotnet@v1
-          with:
-            dotnet-version: '6.x'
+    - name: Build
+      run: dotnet build --configuration Release --output ./output
 
-        - name: Build
-          run: dotnet publish --configuration Release --self-contained -r win-x64
-
-        - name: Create Release
-          id: create_release
-          uses: softprops/action-gh-releases@v1
-          with:
-            files: |
-                releases/YoutubeDownloader
-            tag_name: v1.0.0
-            title: Release v1.0.0
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish
+      run: dotnet publish --configuration Release --output ./output --self-contained true --runtime win-x64
+      
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: app
+        path: ./output
