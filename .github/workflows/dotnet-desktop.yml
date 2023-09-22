@@ -33,35 +33,6 @@ jobs:
         name: app
         path: ./output
 
-    name: Build and Publish .NET Console App
-
-on:
-  push:
-    branches:
-      - master
-
-jobs:
-  build:
-    runs-on: windows-latest
-    
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 6.0.x
-        
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build
-      run: dotnet build --configuration Release --output ./output
-
-    - name: Publish
-      run: dotnet publish --configuration Release --output ./output --self-contained true --runtime win-x64
-      
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
