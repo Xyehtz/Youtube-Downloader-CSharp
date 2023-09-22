@@ -30,16 +30,23 @@ jobs:
     - name: Publish
       run: dotnet publish --configuration Release --output ./output --self-contained true --runtime win-x64
       
+    - name: Zip Output Folder
+      uses: marvinpinto/action-zip@v1
+      with:
+        name: ./output
+        dest: ./output.zip
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: app
-        path: ./output
+        path: ./output.zip
 
-    - name: Create GitHub Release
+    - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ./output/*
+        files: ./output.zip
         tag_name: v1.0.0
+        release_name: Releasee v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
