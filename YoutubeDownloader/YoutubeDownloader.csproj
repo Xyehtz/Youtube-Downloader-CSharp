@@ -14,4 +14,12 @@
     <PackageReference Include="YoutubeExplode.Converter" Version="6.3.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include=".github\workflows\publish.yml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="releases\YoutubeDownloader\" />
+  </ItemGroup>
+
 </Project>

@@ -83,8 +83,8 @@ class PlaylistDownload
         int i = 1;
 
         await foreach (var video in youtube.Playlists.GetVideosAsync(url))
-        {   
-            if (!video.Title.Contains("|"))
+        {
+            if (!Verification.ContainsInvalidCharacters(video.Title))
             {
                 var title = video.Title;
 
@@ -100,13 +100,22 @@ class PlaylistDownload
                 i++;
             } else
             {
-                Console.WriteLine($"Skipping {video.Title} due to it contining a special character, no windows file can contain special charactershttps://www.youtube.com/playlist?list=PLgi87Xpcq7EQQC9OFAznkawvlj7aLCeAW");
+                Console.WriteLine($"Skipping {video.Title} due to it contining a special character, no windows file can contain special characters\n");
                 continue;
             }
             
         }
 
         Console.WriteLine($"{i} files have been downloaded on {Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic))}");
+    }
+}
+
+class Verification
+{
+    public static bool ContainsInvalidCharacters(string title)
+    {
+        char[] invalidCharacters = Path.GetInvalidFileNameChars();
+        return title.IndexOfAny(invalidCharacters) != -1;
     }
 }
 
