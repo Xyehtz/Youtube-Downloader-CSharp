@@ -1,0 +1,52 @@
+# Action to build and release the console app
+# Repo now has the secret
+
+name: Build and Publish .NET Console App
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --output ./output
+
+    - name: Publish
+      run: dotnet publish --configuration Release --output ./output --self-contained true --runtime win-x64
+      
+    - name: Zip Output Folder
+      uses: marvinpinto/action-zip@v1
+      with:
+        name: ./output
+        dest: ./output.zip
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: app
+        path: ./output.zip
+
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./output.zip
+        tag_name: v1.0.0
+        release_name: Releasee v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
