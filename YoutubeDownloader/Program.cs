@@ -3,12 +3,33 @@ using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 using MusicPlayer;
 using CliWrap.EventStream;
+using NAudio.Wave;
 
 namespace Program;
 
 public class Methods
 {
-    public static async Task Main(string[] args)
+    public static async Task Main()
+    {
+        Console.WriteLine("Type:\n1. To play music\t\t2. To download and listen music");
+        string key = Console.ReadLine();
+
+        if (key == "1")
+        {
+            PlayLoop player = new PlayLoop();
+            PlayLoop.Play();
+        } else if (key == "2")
+        {
+            Program.Methods link = new Program.Methods();
+            await Program.Methods.Link();
+        } else
+        {
+            Console.WriteLine($"{key} is not a valid input, try again.");
+            Program.Methods main = new Program.Methods();
+            await Program.Methods.Main();
+        }
+    }
+    public static async Task Link()
     {
         Console.WriteLine("Paste the URL of the video to download");
         string youtubeLink = Console.ReadLine();
@@ -61,7 +82,11 @@ class Download
 
         await youtube.Videos.Streams.DownloadAsync(streamInfo, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.mp3"));
 
-        Console.WriteLine($"\n{title} downloaded succesfully on:\t{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic))}");
+        Convert.Mp3ToWav(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.mp3"), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.wav"));
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"\n{title} downloaded succesfully on:\n\t{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic))}");
+        Console.ResetColor();
     }
 }
 
@@ -80,10 +105,10 @@ class PlaylistDownload
             Console.WriteLine($"\nTitle:\t\t{title}\nAuthor:\t\t{author}\nDuration:\t{duration}\n");
         }
 
-        int i = 1;
+        int i = 0;
 
         await foreach (var video in youtube.Playlists.GetVideosAsync(url))
-        {
+        { 
             if (!Verification.ContainsInvalidCharacters(video.Title))
             {
                 var title = video.Title;
@@ -95,18 +120,23 @@ class PlaylistDownload
 
                 await youtube.Videos.Streams.DownloadAsync(streamInfo, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.mp3"));
 
-                Console.WriteLine($"Succesfuly downloaded {title}. Total downloads: {i}");
+                Convert.Mp3ToWav(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.mp3"), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.wav"));
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Succesfuly downloaded {video.Title}. Total downloads: {i}");
 
                 i++;
             } else
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Skipping {video.Title} due to it contining a special character, no windows file can contain special characters\n");
+                Console.ResetColor();
                 continue;
             }
-            
+            Console.ResetColor();
         }
 
-        Console.WriteLine($"{i} files have been downloaded on {Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic))}");
+        Console.WriteLine($"{i} files have been downloaded on:\n\t{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic))}");
     }
 }
 
@@ -116,6 +146,21 @@ class Verification
     {
         char[] invalidCharacters = Path.GetInvalidFileNameChars();
         return title.IndexOfAny(invalidCharacters) != -1;
+    }
+}
+
+class Convert
+{
+    public static void Mp3ToWav(string mp3File, string outputFile)
+    {
+        using (MediaFoundationReader reader = new MediaFoundationReader(mp3File))
+        {
+            using (WaveStream pcmStream = WaveFormatConversionStream.CreatePcmStream(reader))
+            {
+                WaveFileWriter.CreateWaveFile(outputFile, pcmStream);
+                File.Delete(mp3File);
+            }
+        }
     }
 }
 

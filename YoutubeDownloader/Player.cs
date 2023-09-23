@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Media;
+using NAudio;
 using NAudio.Wave;
 
 namespace MusicPlayer
@@ -12,26 +13,40 @@ namespace MusicPlayer
     {
         public static void Player()
         {
+            Console.Clear();
             var mediaPlayer = new WaveOutEvent();
-            string musicFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic));
-            string[] musicFiles = Directory.GetFiles(musicFolderPath, "*.mp3");
+            string folderPaht = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic));
+            var files = Directory.GetFiles(folderPaht, "*.wav");
+            long fileSize = 0;
 
-            foreach (string musicFile in musicFiles)
+            if (files.Length == 0)
             {
-                var audioFile = new AudioFileReader(musicFile);
+                Console.WriteLine($"There are no compatible files on {folderPaht}");
+                return;
+            }
 
-                int lenght = musicFile.Length - 26;
-                string subString = musicFile.Substring(22, lenght);
+            foreach (var file in files)
+            {
+                System.IO.FileInfo fileInfo = new FileInfo(file);
+                fileSize = fileInfo.Length;
+
+                var audioFile = new AudioFileReader(file);
+                int duration = (int)Math.Round(audioFile.TotalTime.TotalMilliseconds);
+
+                int length = file.Length - 26;
+                string subString = file.Substring(22, length);
+                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine($"Now playing {subString}");
 
                 mediaPlayer.Init(audioFile);
                 mediaPlayer.Play();
 
-                Console.ReadKey();
-                mediaPlayer.Stop();
-                
+                Thread.Sleep(duration);
+                mediaPlayer.Dispose();
             }
-            mediaPlayer.Dispose();
+            Console.ResetColor();
+            Console.WriteLine("Playlist finished");
+
         }
-}
+    }
 }
