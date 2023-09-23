@@ -31,19 +31,19 @@ jobs:
       run: dotnet publish --configuration Release --output ./output --self-contained true --runtime win-x64
       
     - name: Zip Output Folder
-      run: Compress-Archive -Path ./output -DestinationPath ./output.zip
+      run: Compress-Archive -Path ./output -DestinationPath ./mediaPlayer.zip
       shell: pwsh
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: app
-        path: ./output.zip
+        path: ./mediaPlayer.zip
 
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ./output.zip
+        files: ./mediaPlayer.zip
         tag_name: v1.0.0
         release_name: Release v1.0.0
       env:
