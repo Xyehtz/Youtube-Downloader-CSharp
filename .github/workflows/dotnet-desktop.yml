@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
     - name: Checkout
@@ -31,9 +31,8 @@ jobs:
       run: dotnet publish --configuration Release --output ./output --self-contained true --runtime win-x64
       
     - name: Zip Output Folder
-      uses: montudor/action-zip@v1
-      with:
-        args: -r -j ./output ./output.zip
+      run: Compress-Archive -Path ./output -DestinationPath ./output.zip Force
+      shell: pwsh
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -46,6 +45,6 @@ jobs:
       with:
         files: ./output.zip
         tag_name: v1.0.0
-        release_name: Releasee v1.0.0
+        release_name: Release v1.0.0
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
