@@ -27,7 +27,7 @@ namespace MusicPlayer
             var files = Directory.GetFiles(folderPaht, "*.wav");
             long fileSize = 0;
 
-            // Check if there are wav files inside of the folder, if not, display an error message
+            // Check if there are .wav files inside of the folder, if not, display an error message
 
             if (files.Length == 0)
             {
