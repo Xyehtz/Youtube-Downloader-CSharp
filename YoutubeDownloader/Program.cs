@@ -75,18 +75,29 @@ class Download
     {
         var video = await youtube.Videos.GetAsync(url);
 
-        var streamManifest = await youtube.Videos.Streams.GetManifestAsync(url);
-        var streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+        if (!Verification.ContainsInvalidCharacters(video.Title))
+        {
+            var streamManifest = await youtube.Videos.Streams.GetManifestAsync(url);
+            var streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
 
-        var stream = await youtube.Videos.Streams.GetAsync(streamInfo);
+            var stream = await youtube.Videos.Streams.GetAsync(streamInfo);
 
-        await youtube.Videos.Streams.DownloadAsync(streamInfo, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.mp3"));
+            await youtube.Videos.Streams.DownloadAsync(streamInfo, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.mp3"));
 
-        Convert.Mp3ToWav(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.mp3"), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.wav"));
+            Convert.Mp3ToWav(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.mp3"), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic), $"{title}.wav"));
 
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"\n{title} downloaded succesfully on:\n\t{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic))}");
-        Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\n{title} downloaded succesfully on:\n\t{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonMusic))}");
+            Console.ResetColor();
+        } else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Error: {video.Title} contains invalid characters, please try again using a new link");
+            Console.ResetColor();
+
+            Program.Methods link = new Program.Methods();
+            await Program.Methods.Link();
+        }
     }
 }
 
