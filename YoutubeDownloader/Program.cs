@@ -111,12 +111,21 @@ class Download
 {
     public static async Task DownloadMethod(YoutubeClient youtube, string url, string title)
     {
-        // Obtain the new
+        // Obtain the variables and obtain again the information of the youtube video
 
         var video = await youtube.Videos.GetAsync(url);
 
+        // Verify if the video title contains any type of invalid characters
+
         if (!Verification.ContainsInvalidCharacters(video.Title))
         {
+            // If ContainsInvalidCharacters is false, meaning that there are no invalid characters the download proccess will start
+
+            /* Obtain the manifest of the video
+             * After the manifest is obtained the program will select only the audio versions of the video
+             * After obtaining the audio versions of the video, the program will get the one with the highest bitrate
+             */
+
             var streamManifest = await youtube.Videos.Streams.GetManifestAsync(url);
             var streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
 
@@ -193,9 +202,18 @@ class PlaylistDownload
 
 class Verification
 {
+    // This method will obtain the youtube title of the video
+
     public static bool ContainsInvalidCharacters(string title)
     {
+        // Inside of this method a list will be created containing all of the invalid characters on windows
+
         char[] invalidCharacters = Path.GetInvalidFileNameChars();
+
+        /* Verify if an invalid character is present inside of the title
+         * If the title contains a valid character it will return true
+         */
+
         return title.IndexOfAny(invalidCharacters) != -1;
     }
 }
