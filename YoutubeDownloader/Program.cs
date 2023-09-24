@@ -1,4 +1,6 @@
-﻿using System;
+﻿// All of the files in this project will have a great amount of comments so that everyone that reads this code can understand it
+
+using System;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 using MusicPlayer;
@@ -9,44 +11,80 @@ namespace Program;
 
 public class Methods
 {
+    // This is the main method of this project, the project will start from this method
+
     public static async Task Main()
     {
+        // The first thing that will appear on the console is this message, letting the user know what to do
+
         Console.WriteLine("Type:\n1. To play music\t\t2. To download and listen music");
+
+        // key will save the selection done by the user
+
         string key = Console.ReadLine();
+
+        // This if statement will verify the input of the user and depending on it will do something
 
         if (key == "1")
         {
+            // If the user types 1 the program will run the Play method, this will end up playing the music
+
             PlayLoop player = new PlayLoop();
             PlayLoop.Play();
         } else if (key == "2")
         {
+            // When the user types 2 the program will call the Link method and start the process of downloading music
+
             Program.Methods link = new Program.Methods();
             await Program.Methods.Link();
         } else
         {
+            // If the input of the user is not 1 nor 2 the program will show an error message and restart the program for the user  to make a new selection
+
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"{key} is not a valid input, try again.");
             Program.Methods main = new Program.Methods();
             await Program.Methods.Main();
+            Console.ResetColor();
         }
     }
     public static async Task Link()
     {
-        Console.WriteLine("Paste the URL of the video to download");
+        // This method will show a new message to the user to paste the url of the video or playlist to download
+
+        Console.WriteLine("Paste the URL of the video or playlist to download");
+
+        // youtubeLink will save the link given by the user
+
         string youtubeLink = Console.ReadLine();
+
+        /* This if statement will do the following
+         * Obtain the youtube link gave by the user
+         * Check if the link contains either the base link for a video or a playlist
+         */
 
         if (youtubeLink.Contains("https://www.youtube.com/watch?v="))
         {
+            // After the link has been verified the program will start the Youtube client to obtain the basic information of the video
+
             var youtube = new YoutubeClient();
             var obtainVideo = await youtube.Videos.GetAsync(youtubeLink);
+
+            // Here, basic information like the title, author and duration will be saved on three diferent variables
 
             string title = obtainVideo.Title;
             var author = obtainVideo.Author;
             var duration = obtainVideo.Duration;
 
+            // Show the information to the user, to confirm if the video is indeed the one selected by the user
+
             Console.WriteLine($"\nTitle:\t\t{title}\nAuthor:\t\t{author}\nDuration:\t{duration}");
 
-            Download download = new Download();
+            /* The program calls the download method to start the download of the video
+             * For this to properlly work the program will give the youtube variable and the youtubeLink and title strings
+             */
 
+            Download download = new Download();
             await Download.DownloadMethod(youtube, youtubeLink, title);
 
             PlayLoop player = new PlayLoop();
@@ -73,6 +111,8 @@ class Download
 {
     public static async Task DownloadMethod(YoutubeClient youtube, string url, string title)
     {
+        // Obtain the new
+
         var video = await youtube.Videos.GetAsync(url);
 
         if (!Verification.ContainsInvalidCharacters(video.Title))
