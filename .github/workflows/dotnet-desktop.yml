@@ -10,7 +10,10 @@ on:
     branches: ["master"]
 
 jobs:
-  setup-NET:
+  Compile_and_release_project:
+    permissions:
+        contents: write
+
     runs-on: windows-latest
     
     steps:
