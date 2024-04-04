@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-latest
     
     steps:
-    - name: Checkout
+    - name: Checkout project
       uses: actions/checkout@v4
       
     - name: Setup .NET
@@ -22,24 +22,16 @@ jobs:
       with:
         dotnet-version: 6.0.x
         
-  build-and-publish-NET-app:
-    runs-on: windows-latest
-
-    steps:
-    - name: Restore dependencies
+    - name: Restore .NET dependencies
       run: dotnet restore
 
-    - name: Build
+    - name: Build .NET project
       run: dotnet build --configuration Release --output ./output
 
-    - name: Publish
+    - name: Publish .NET project
       run: dotnet publish --configuration Release --output ./output --self-contained true --runtime win-x64
-      
-  release-NET-app:
-    runs-on: windows-latest
 
-    steps:
-    - name: Zip Output Folder
+    - name: Crete ZIP folder for the project
       run: Compress-Archive -Path ./output -DestinationPath ./mediaPlayer.zip
       shell: pwsh
 
