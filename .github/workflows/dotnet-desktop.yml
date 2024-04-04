@@ -5,9 +5,9 @@ name: Build and Publish .NET Console App
 
 on:
   push:
-    branches:
-      - master
-      - actions-fix
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
 
 jobs:
   setup-NET:
