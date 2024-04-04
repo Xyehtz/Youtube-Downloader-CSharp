@@ -6,7 +6,7 @@ name: Build and Publish .NET Console App
 on:
   push:
     branches:
-      - master`
+      - master
       - actions-fix
 
 jobs:
