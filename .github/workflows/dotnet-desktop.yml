@@ -5,48 +5,54 @@ name: Build and Publish .NET Console App
 
 on:
   push:
-    branches:
-      - master
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
 
 jobs:
-  build-and-release:
-    runs-on: windows-latest
+  Compile_and_release_project:
+    permissions:
+        contents: write
 
-    permissions: 
-      contents: write
+    runs-on: windows-latest
     
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+    - name: Checkout project
+      uses: actions/checkout@v4
       
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
         
-    - name: Restore dependencies
+    - name: Restore .NET dependencies
       run: dotnet restore
 
-    - name: Build
+    - name: Build .NET project
       run: dotnet build --configuration Release --output ./output
 
-    - name: Publish
+    - name: Publish .NET project
       run: dotnet publish --configuration Release --output ./output --self-contained true --runtime win-x64
-      
-    - name: Zip Output Folder
+
+    - name: Crete ZIP folder for the project
       run: Compress-Archive -Path ./output -DestinationPath ./mediaPlayer.zip
       shell: pwsh
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: app
-        path: ./mediaPlayer.zip
-
-    - name: Upload to Release
+    - name: Create GitHub release
+      id: create-new-release
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        files: ./mediaPlayer.zip
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.run_number }}
+        name: Release ${{ github.run_number }}
+      
+    - name: Upload release asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create-new-release.outputs.upload_url }}
+        asset_path: ./mediaPlayer.zip
+        asset_name: YouTubeDownloader@v${{ github.run_number }}.zip
+        asset_content_type: application/zip
